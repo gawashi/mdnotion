@@ -85,21 +85,37 @@ class Heading(Paragraph):
     Heading block.
     """
 
-    def __new__(cls, level: int, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        if "level" in kwargs:
+            level = kwargs["level"]
+        else:
+            level = args[1] if len(args) > 1 else None
+            if level is None:
+                raise TypeError("Heading.__new__() missing required argument: 'level'")
+
         if level <= 3:
             instance = super().__new__(cls)
             instance._type = f"heading_{level}"
             return instance
         else:
-            return Paragraph.__new__(cls)
+            # remove level
+            kwargs.pop("level", None)
+            if len(args) > 1:
+                args = args[:1] + args[2:]
+
+            # TODO: toggleable
+            instance = Paragraph.__new__(Paragraph)
+            Paragraph.__init__(instance, *args, **kwargs)
+
+            return instance
 
     def __init__(
         self,
         rich_text: RichText | Iterable[RichText],
         level: int,
         color: str = "default",
-        is_toggleable: bool = False,
         children=None,
+        is_toggleable: bool = False,
     ):
         super().__init__(rich_text=rich_text, color=color, children=children)
         self.level = level

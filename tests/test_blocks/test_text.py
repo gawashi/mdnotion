@@ -98,6 +98,8 @@ class TestHeading(TestCase):
         self.assertIsInstance(heading4, Paragraph)
         self.assertEqual(heading4.block_type, "paragraph")
 
+        Heading(rich_text, 4)  # Test with positional arguments
+
     def test_to_dict(self):
         text = "Hello, World!"
         rich_text = RichText(content=text)
@@ -113,3 +115,15 @@ class TestHeading(TestCase):
         }
 
         self.assertEqual(heading.to_dict(), expected_dict)
+
+        # Test heanding 4
+        heading4 = Heading(rich_text, level=4)
+        expected_dict = {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [rich_text.to_dict()],
+                "color": "default",
+            },
+        }
+
+        self.assertEqual(heading4.to_dict(), expected_dict)
