@@ -1,6 +1,3 @@
-from collections.abc import Iterable
-
-
 class BaseBlock:
     """
     Base class for all blocks.
@@ -8,8 +5,8 @@ class BaseBlock:
 
     _type = "base"
 
-    def __init__(self, children: Iterable | None = None):
-        self.children = children if children is not None else []
+    def __init__(self):
+        pass
 
     @property
     def block_type(self) -> str:
@@ -20,7 +17,4 @@ class BaseBlock:
         Convert the block to a dictionary representation.
         """
         result = {"type": self.block_type}
-        if self.children:
-            result["children"] = [child.to_dict() for child in self.children]
-
         return result

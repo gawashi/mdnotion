@@ -63,19 +63,24 @@ class Paragraph(BaseBlock):
         self,
         rich_text: RichText | Iterable[RichText],
         color: str = "default",
-        children=None,
+        children: Iterable[BaseBlock] | None = None,
     ):
-        super().__init__(children=children)
+        super().__init__()
         if isinstance(rich_text, RichText):
             rich_text = [rich_text]
 
         self.rich_text = rich_text
         self.color = color
 
+        self.children = children
+
     def to_dict(self) -> dict:
         result = super().to_dict()
         result[self.block_type] = {"rich_text": [child.to_dict() for child in self.rich_text]}
         result[self.block_type]["color"] = self.color
+
+        if self.children is not None:
+            result["children"] = [child.to_dict() for child in self.children]
 
         return result
 
@@ -117,7 +122,10 @@ class Heading(Paragraph):
         children=None,
         is_toggleable: bool = False,
     ):
+        if not is_toggleable and children is not None:
+            children = None
         super().__init__(rich_text=rich_text, color=color, children=children)
+
         self.level = level
         self.is_toggleable = is_toggleable
 
@@ -125,7 +133,7 @@ class Heading(Paragraph):
         result = super().to_dict()
 
         result[self.block_type]["is_toggleable"] = self.is_toggleable
-        if self.is_toggleable and len(self.children) == 0:
-            result["children"] = []
+        if not self.is_toggleable:
+            result[self.block_type].pop("children", None)
 
         return result

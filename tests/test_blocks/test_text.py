@@ -74,6 +74,18 @@ class TestParagraph(TestCase):
         }
         self.assertEqual(block.to_dict(), expected_dict)
 
+        # Test with children
+        block_with_child = Paragraph(rich_text=rich_text, children=[block])
+        expected_dict = {
+            "type": self.block_type,
+            self.block_type: {
+                "rich_text": [rich_text.to_dict()],
+                "color": "default",
+            },
+            "children": [block.to_dict()],
+        }
+        self.assertEqual(block_with_child.to_dict(), expected_dict)
+
 
 class TestHeading(TestCase):
     block_type = "heading_1"
