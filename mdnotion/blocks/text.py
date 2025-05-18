@@ -76,7 +76,7 @@ class Paragraph(BaseBlock):
 
     def to_dict(self) -> dict:
         result = super().to_dict()
-        result[self.block_type] = {"rich_text": [child.to_dict() for child in self.rich_text]}
+        result[self.block_type]["rich_text"] = [rt.to_dict() for rt in self.rich_text]
         result[self.block_type]["color"] = self.color
 
         if self.children is not None:
@@ -135,5 +135,39 @@ class Heading(Paragraph):
         result[self.block_type]["is_toggleable"] = self.is_toggleable
         if not self.is_toggleable:
             result[self.block_type].pop("children", None)
+
+        return result
+
+
+class Code(BaseBlock):
+    """
+    Code block.
+    """
+
+    _type = "code"
+
+    def __init__(
+        self,
+        rich_text: RichText | Iterable[RichText],
+        caption: RichText | Iterable[RichText] | None = None,
+        language: str = "plain text",
+    ):
+        super().__init__()
+        if isinstance(rich_text, RichText):
+            rich_text = [rich_text]
+        if isinstance(caption, RichText):
+            caption = [caption]
+
+        self.rich_text = rich_text
+        self.caption = caption
+        self.language = language
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result[self.block_type]["rich_text"] = [rt.to_dict() for rt in self.rich_text]
+        result[self.block_type]["language"] = self.language
+
+        if self.caption is not None:
+            result[self.block_type]["caption"] = [rt.to_dict() for rt in self.caption]
 
         return result
